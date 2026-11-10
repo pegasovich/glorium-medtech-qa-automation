@@ -1,0 +1,34 @@
+# AI Coding Rules for Glorium MedTech Test Automation Framework
+# Targeted for: Cursor, Claude, GitHub Copilot
+
+## General Principles
+- Language: C# (.NET 8)
+- Test Framework: NUnit 4.x with Microsoft.Playwright.NUnit
+- Assertions: Playwright built-in Web Assertions (`Expect(locator).To...`) for UI, FluentAssertions for API/DTO verification
+- Code Style: Clean Code, SOLID, idiomatic C# (file-scoped namespaces, nullable reference types, async/await everywhere)
+
+## Architecture & Responsibilities
+- `Glorium.Automation.Core`: Infrastructure only (config, browser context hooks, tracing, Bogus fake data generators).
+- `Glorium.Automation.Api`: HTTP/REST clients (using Playwright `IAPIRequestContext` or HttpClient), DTOs, request builders. No UI logic.
+- `Glorium.Automation.Ui`: Page Objects (`BasePage` subclasses) and Component Objects (`BaseComponent`). Never assert directly inside Page Objects (return locators or page states; keep assertions in test methods).
+- `tests/*`: NUnit test fixtures. Keep tests readable as living documentation. Use Arrange-Act-Assert (AAA) pattern.
+
+## Playwright Best Practices
+- ALWAYS prefer user-facing locators:
+  1. `GetByRole` (e.g. `Page.GetByRole(AriaRole.Button, new() { Name = "Submit" })`)
+  2. `GetByLabel`, `GetByPlaceholder`, `GetByText`
+  3. `GetByTestId` (configured to `data-testid`)
+  4. Avoid brittle XPath or deep CSS chains (`div > div > span:nth-child(2)` is strictly forbidden).
+- NEVER use `Thread.Sleep` or arbitrary `Task.Delay`. Rely on Playwright auto-waiting and `Expect(locator).ToBeVisibleAsync()`.
+- Parallel safety: Tests must run in parallel without race conditions. Each test fixture or method must be isolated with unique data (use `MedicalDataFaker`).
+- Tracing & Diagnostics: Attach Playwright Traces (`trace.zip`) on failure for post-mortem debugging.
+
+## Healthcare / MedTech Domain Specifics
+- Always mask or anonymize mock PHI (Protected Health Information) in logs.
+- Generate valid formatted fake identifiers (e.g. US Insurance ID pattern, National Provider Identifier NPI, Equipment Serial numbers).
+- Use Bogus `Faker` instances configured with `en_US` locale.
+
+## Test Naming Convention
+- Pattern: `[MethodOrFeature]_[Scenario]_[ExpectedResult]`
+- Example: `CreateOrder_WithValidPatientAndEquipment_GeneratesPendingInvoice`
+- Annotate with NUnit tags: `[Test, Category("E2E"), Category("Orders")]`
