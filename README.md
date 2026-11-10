@@ -90,8 +90,8 @@ graph TD
 
 ### 1. Clone & Build
 ```powershell
-git clone <repo-url>
-cd Glorium
+git clone https://github.com/pegasovich/glorium-medtech-qa-automation.git
+cd glorium-medtech-qa-automation
 dotnet build Glorium.MedTech.Automation.sln
 ```
 
@@ -145,3 +145,4 @@ The `.gitlab-ci.yml` pipeline runs inside the official `mcr.microsoft.com/playwr
   * Auto-waiting locators, test retries in CI, strict data isolation via Bogus fakers, and recording Playwright Traces for deterministic root-cause analysis.
 - **How do you leverage AI tools (Cursor / Claude)?**
   * Using repository-specific `.cursorrules` to instruct the AI to follow POM conventions, favor accessible user-facing locators (`GetByRole`), and write self-documenting AAA tests.
+
